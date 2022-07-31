@@ -11,7 +11,7 @@ typedef struct vm_page_family_{
 }vm_page_family_t;
 
 typedef struct vm_page_for_families_{
-    vm_page_for_families_t next*;
+    struct vm_page_for_families_t next*;
     vm_page_family_t vm_page_family[0];
 }vm_page_for_families_t;
 
