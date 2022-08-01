@@ -14,9 +14,9 @@
 
 #define ITER_PAGE_FAMILY_BEGIN(first_page_for_families_ptr, current) \
 {                                                          \
-    __uint32_t count = 0;                                  \
+    __uint32_t count_macro = 0;                                  \
     for(current = (vm_page_family_t *)&first_page_for_families_ptr->vm_page_family[0]; \
-                    current->size && count < MAX_FAMILIES_PER_VM_PAGE; current++, count++){ \
+                    current->size && count < MAX_FAMILIES_PER_VM_PAGE; current++, count_macro++){ \
 
 #define ITER_PAGE_FAMILY_END(first_page_for_families_ptr, current) }}
 
