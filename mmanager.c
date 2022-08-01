@@ -15,13 +15,12 @@ static size_t PAGE_SIZE = 0;
     ele requer uma página para o kernel e atualiza a variavel
     first_vm_page_for_families apontando para um página válida.
 
-    3- Verifica se a nova vm_page_family_t pode ser adicionada
-        a first_vm_page_for_families_t.
+    3- Verifica se a nova vm_page_family_t pode ser adicionada a first_vm_page_for_families_t.
         3.1- Se caso ela pode ser adicionada, então vm_page_family_t é
              adicionada no array vm_page_family da estrutura vm_page_for_families_t.
-             3.2- No caso de não entrada então o gerenciador requer uma nova
-             página para o kernel, atualiza o ponteiro first_vm_page_for_families
-             para a página alocada mais recentemente.
+                3.2- No caso de não entrada então o gerenciador requer uma nova
+                página para o kernel, atualiza o ponteiro first_vm_page_for_families
+                para a página alocada mais recentemente.
 */
 static vm_page_for_families_t *first_vm_page_for_families = NULL;
 
@@ -63,8 +62,8 @@ static signed int mmanager_page_dealloc(void* memory_page_addr, int units){
 
 void mmanager_new_page_family(char* struct_name, __uint32_t size){
 
-    vm_page_family_t* vm_page_family_curr = NULL;
-    vm_page_for_families_t* new_vm_page_for_families = NULL;
+     vm_page_family_t* vm_page_family_curr = NULL;
+     vm_page_for_families_t* new_vm_page_for_families = NULL;
 
     if(size > PAGE_SIZE){
 
@@ -108,3 +107,5 @@ void mmanager_new_page_family(char* struct_name, __uint32_t size){
     vm_page_family_curr->size = size;
     
 }
+
+
