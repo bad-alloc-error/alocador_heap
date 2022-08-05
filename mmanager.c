@@ -2,6 +2,7 @@
 #include<memory.h>
 #include<sys/mman.h>
 #include<string.h>
+#include<stdio.h>
 #include"headers/mmanager.h"
 
 static size_t PAGE_SIZE = 0;
@@ -60,7 +61,7 @@ static signed int mmanager_page_dealloc(void* memory_page_addr, int units){
 
 }
 
-void mmanager_new_page_family(char* struct_name, __uint32_t size){
+void mmanager_new_page_family(char* struct_name, uint32_t size){
 
      vm_page_family_t* vm_page_family_curr = NULL;
      vm_page_for_families_t* new_vm_page_for_families = NULL;
@@ -84,7 +85,7 @@ void mmanager_new_page_family(char* struct_name, __uint32_t size){
         return;
     }
 
-    __uint32_t count = 0;
+    uint32_t count = 0;
 
     ITER_PAGE_FAMILY_BEGIN(first_vm_page_for_families, vm_page_family_curr){
 

@@ -1,5 +1,6 @@
 #ifndef _MMANAGER_H_
 #define _MMANAGER_H_
+#include<stdint.h>
 
 /*Para obter o número máximo de page_family_t que podemos armazenar dentro de uma page
     do tipo vm_page_for_families_t é pegar o tamanho da pagina alocada, subtrair pelo tamanho
@@ -14,7 +15,7 @@
 
 #define ITER_PAGE_FAMILY_BEGIN(first_page_for_families_ptr, current) \
 {                                                          \
-    __uint32_t count_macro = 0;                                  \
+    uint32_t count_macro = 0;                                  \
     for(current = (vm_page_family_t *)&first_page_for_families_ptr->vm_page_family[0]; \
                     current->size && count < MAX_FAMILIES_PER_VM_PAGE; current++, count_macro++){ \
 
@@ -24,11 +25,11 @@
 
 typedef struct vm_page_family_{
     char struct_name[MAXSIZE_PAGE_FAMILY_NAME];
-    __uint32_t size;
+    uint32_t size;
 }vm_page_family_t;
 
 typedef struct vm_page_for_families_{
-    struct vm_page_for_families_t *next;
+    struct vm_page_for_families_* next;
     vm_page_family_t vm_page_family[0];
 }vm_page_for_families_t;
 
@@ -36,6 +37,6 @@ typedef struct vm_page_for_families_{
 void mmanager_init(void);
 static void* mmanager_page_alloc(int vmp_units);
 static signed int mmanager_page_dealloc(void* memory_page_addr, int units);
-void mmanager_new_page_family(char* stuct_name, __uint32_t size);
+void mmanager_new_page_family(char* stuct_name, uint32_t size);
 
 #endif
