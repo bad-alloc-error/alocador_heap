@@ -3,9 +3,9 @@
 #include "headers/mmanager.h"
 /*Interface entre o Heap Manager Lib e aplicação do usuário*/
 
-void mmanager_init();
+void mmanager_init(void);
 
-void mmanager_new_page_family(char* struct_name, uint32_t struct_site);
+void mmanager_new_page_family(char* struct_name, uint32_t struct_size);
 
 #define MMANAGER_STRUCT_REGISTER(struct_name) \
     (mmanager_new_page_family(#struct_name, sizeof(struct_name)))
