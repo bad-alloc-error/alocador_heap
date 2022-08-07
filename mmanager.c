@@ -63,30 +63,34 @@ static signed int mmanager_page_dealloc(void* memory_page_addr, int units){
 
 void mmanager_print_registered_page_families(){
 
+
+
     int count = 0;
+    vm_page_for_families_t* first_vm_page = first_vm_page_for_families;
     vm_page_family_t* page_family_current = NULL;
 
-    ITER_PAGE_FAMILY_BEGIN(first_vm_page_for_families, page_family_current){
+    ITER_PAGE_FAMILY_BEGIN(first_vm_page, page_family_current){
         printf("Page Family Name: %s - Size: %d\n", 
-                first_vm_page_for_families->vm_page_family[count].struct_name,
-                first_vm_page_for_families->vm_page_family[count].size);
+                first_vm_page->vm_page_family[count].struct_name,
+                first_vm_page->vm_page_family[count].size);
         count++;
-    }ITER_PAGE_FAMILY_END(first_vm_page_for_families, page_family_current);
+    }ITER_PAGE_FAMILY_END(first_vm_page, page_family_current);
 
 }
 
 vm_page_family_t* lookup_page_family_by_name(char* struct_name){
 
+    vm_page_for_families_t* first_vm_page = first_vm_page_for_families;
     vm_page_family_t* page_family_current = NULL;
 
-    ITER_PAGE_FAMILY_BEGIN(first_vm_page_for_families, page_family_current){
+    ITER_PAGE_FAMILY_BEGIN(first_vm_page, page_family_current){
 
         if(strncmp(page_family_current->struct_name, struct_name, MAXSIZE_PAGE_FAMILY_NAME) == 0){
             
             return page_family_current;
         }
         
-    }ITER_PAGE_FAMILY_END(first_vm_page_for_families, page_family_current);
+    }ITER_PAGE_FAMILY_END(first_vm_page, page_family_current);
 
     return NULL;
 
