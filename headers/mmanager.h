@@ -13,13 +13,13 @@
     (PAGE_SIZE - sizeof(vm_page_for_families_t *)/\
         sizeof(vm_page_family_t))
 
-#define ITER_PAGE_FAMILY_BEGIN(first_page_for_families_ptr, current) \
+#define ITER_PAGE_FAMILY_BEGIN(FIRST_PAGE_FOR_FAMILIES_PTR, CURRENT) \
 {                                                          \
     uint32_t count_macro = 0;                                  \
-    for(current = (vm_page_family_t *)&first_page_for_families_ptr->vm_page_family[0]; \
-                    current->size && count < MAX_FAMILIES_PER_VM_PAGE; current++, count_macro++){ \
+    for(CURRENT = (vm_page_family_t *)&FIRST_PAGE_FOR_FAMILIES_PTR->vm_page_family[0]; \
+                    CURRENT->size && count_macro < MAX_FAMILIES_PER_VM_PAGE; CURRENT++, count_macro++){ \
 
-#define ITER_PAGE_FAMILY_END(first_page_for_families_ptr, current) }}
+#define ITER_PAGE_FAMILY_END(FIRST_PAGE_FOR_FAMILIES_PTR, CURRENT) }}
 
 #define MAXSIZE_PAGE_FAMILY_NAME 32
 
@@ -38,5 +38,7 @@ void mmanager_init(void);
 static void* mmanager_page_alloc(int vmp_units);
 static signed int mmanager_page_dealloc(void* memory_page_addr, int units);
 void mmanager_new_page_family(char* stuct_name, uint32_t size);
+void mmanager_print_registered_page_families();
+vm_page_family_t* lookup_page_family_by_name(char *struct_name);
 
 #endif
