@@ -63,8 +63,6 @@ static signed int mmanager_page_dealloc(void* memory_page_addr, int units){
 
 void mmanager_print_registered_page_families(){
 
-
-
     int count = 0;
     vm_page_for_families_t* first_vm_page = first_vm_page_for_families;
     vm_page_family_t* page_family_current = NULL;
