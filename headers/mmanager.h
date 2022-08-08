@@ -31,14 +31,15 @@ typedef struct vm_page_family_{
 typedef struct vm_page_for_families_{
     struct vm_page_for_families_* next;
     vm_page_family_t vm_page_family[0];
+    uint32_t vm_page_quantity;
 }vm_page_for_families_t;
 
 
 void mmanager_init(void);
-static void* mmanager_page_alloc(int vmp_units);
-static signed int mmanager_page_dealloc(void* memory_page_addr, int units);
 void mmanager_new_page_family(char* stuct_name, uint32_t size);
 void mmanager_print_registered_page_families();
+static void* mmanager_page_alloc(int vmp_units);
+static signed int mmanager_page_dealloc(void* memory_page_addr, int units);
 vm_page_family_t* lookup_page_family_by_name(char *struct_name);
 
 #endif
