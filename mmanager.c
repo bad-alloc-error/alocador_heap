@@ -32,13 +32,13 @@ void mmanager_init(){
 
 static void* mmanager_page_alloc(int vmp_units){
 
-    char *mem_page = mmap(NULL, vmp_units * PAGE_SIZE, 0x1 | 0x2 | 0x4, MAP_ANON | MAP_PRIVATE, NULL, NULL);
+    char *mem_page = mmap(NULL, vmp_units * PAGE_SIZE, PROT_EXEC | PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, NULL, NULL);
 
 
     if(mem_page == MAP_FAILED){
 
         /*TODO LOGGING */
-
+        fprintf(stderr, "Error %s() to alloc %d virtual page memory\n", __FUNCTION__, vmp_units);
         return NULL;
     }
 
@@ -53,7 +53,7 @@ static signed int mmanager_page_dealloc(void* memory_page_addr, int units){
 
     if(!SUCCESS_RELEASE){
         /*TODO LOGGING */
-
+        fprintf(stderr, "Error %s() to release %d virtual page memory\n", __FUNCTION__, units);
         return -1;
     }
 
@@ -67,28 +67,34 @@ void mmanager_print_registered_page_families(){
     vm_page_for_families_t* first_vm_page = first_vm_page_for_families;
     vm_page_family_t* page_family_current = NULL;
 
-    ITER_PAGE_FAMILY_BEGIN(first_vm_page, page_family_current){
-        printf("Page Family Name: %s - Size: %d\n", 
-                first_vm_page->vm_page_family[count].struct_name,
-                first_vm_page->vm_page_family[count].size);
-        count++;
-    }ITER_PAGE_FAMILY_END(first_vm_page, page_family_current);
+    for(first_vm_page; first_vm_page != NULL; first_vm_page = first_vm_page->next){
+        
+        ITER_PAGE_FAMILY_BEGIN(first_vm_page, page_family_current){
+            printf("Page Family Name: %s - Size: %d\n", first_vm_page->vm_page_family[count].struct_name, first_vm_page->vm_page_family[count].size);
+            count++;
+        }ITER_PAGE_FAMILY_END(first_vm_page, page_family_current);
 
-}
+    }
+
+}   
 
 vm_page_family_t* lookup_page_family_by_name(char* struct_name){
 
     vm_page_for_families_t* first_vm_page = first_vm_page_for_families;
     vm_page_family_t* page_family_current = NULL;
 
-    ITER_PAGE_FAMILY_BEGIN(first_vm_page, page_family_current){
+    for(first_vm_page; first_vm_page != NULL; first_vm_page = first_vm_page->next){
 
-        if(strncmp(page_family_current->struct_name, struct_name, MAXSIZE_PAGE_FAMILY_NAME) == 0){
+        ITER_PAGE_FAMILY_BEGIN(first_vm_page, page_family_current){
+
+            if(strncmp(page_family_current->struct_name, struct_name, MAXSIZE_PAGE_FAMILY_NAME) == 0){
+                
+                return page_family_current;
+            }
             
-            return page_family_current;
-        }
-        
-    }ITER_PAGE_FAMILY_END(first_vm_page, page_family_current);
+        }ITER_PAGE_FAMILY_END(first_vm_page, page_family_current);
+
+    }
 
     return NULL;
 
@@ -101,7 +107,7 @@ void mmanager_new_page_family(char* struct_name, uint32_t size){
 
     if(size > PAGE_SIZE){
 
-        printf("Error: %s() structure %s size exceeds system page size\n", __FUNCTION__, struct_name);
+        fprintf(stderr, "Error: %s() structure %s size exceeds system page size\n", __FUNCTION__, struct_name);
         return;
     }
 
@@ -110,6 +116,7 @@ void mmanager_new_page_family(char* struct_name, uint32_t size){
         /* Caso nulo, registra uma nova vm_page_for_families_t (tam: PAGE_SIZE)*/
         first_vm_page_for_families = (vm_page_for_families_t *) mmanager_page_alloc(1);
         first_vm_page_for_families->next = NULL;
+        first_vm_page_for_families->vm_page_quantity++;
 
         /* Popula a struct */
         strncpy(first_vm_page_for_families->vm_page_family[0].struct_name, struct_name, MAXSIZE_PAGE_FAMILY_NAME);
@@ -119,6 +126,9 @@ void mmanager_new_page_family(char* struct_name, uint32_t size){
     }
 
     uint32_t count = 0;
+
+    /*Itera sobre a Page Family e checa se o número é maior que o permitido de page family na 
+        pagina virtual, se for, requer ao kernel uma nova página virtual e armazena a fage family lá.*/
 
     ITER_PAGE_FAMILY_BEGIN(first_vm_page_for_families, vm_page_family_curr){
 
@@ -133,6 +143,7 @@ void mmanager_new_page_family(char* struct_name, uint32_t size){
 
         new_vm_page_for_families = (vm_page_for_families_t *)mmanager_page_alloc(1);
         new_vm_page_for_families->next = first_vm_page_for_families;
+        new_vm_page_for_families->vm_page_quantity++;
         first_vm_page_for_families = new_vm_page_for_families;
         vm_page_family_curr = &first_vm_page_for_families->vm_page_family[0];
     }
