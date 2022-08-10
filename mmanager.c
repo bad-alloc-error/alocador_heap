@@ -3,6 +3,7 @@
 #include<sys/mman.h>
 #include<string.h>
 #include<stdio.h>
+#include<assert.h>
 #include"headers/mmanager.h"
 
 static size_t PAGE_SIZE = 0;
@@ -61,6 +62,47 @@ static signed int mmanager_page_dealloc(void* memory_page_addr, int units){
 
 }
 
+void mmanager_print_meta_blocks_vm_page(meta_block_data_t* first_meta_block){
+
+    meta_block_data_t* meta_block = first_meta_block;
+    meta_block_data_t* large_free_block_addr = NULL;
+    meta_block_data_t* large_non_free_block_addr = NULL;
+    vm_page_for_families_t* first_page_families = first_vm_page_for_families;
+    int64_t count_free_blocks, count_non_free_blocks, large_free_block, large_non_free_block = 0;
+    
+
+    for(first_page_families; first_page_families != NULL; first_page_families = first_page_families->next){
+        
+        for(meta_block; meta_block != NULL; meta_block = meta_block->next_block){
+            
+            if(meta_block->is_free == MMANAGER_TRUE){ 
+                count_free_blocks++;
+            }else{
+                count_non_free_blocks++;
+            }
+
+            if(meta_block->block_size > large_free_block && meta_block->is_free == MMANAGER_TRUE){
+                large_free_block = meta_block->block_size;
+                large_free_block_addr = meta_block;
+            }
+
+            if(meta_block->block_size > large_non_free_block && meta_block->is_free == MMANAGER_FALSE){
+                large_non_free_block = meta_block->block_size;
+                large_non_free_block_addr = meta_block;
+            }
+
+            assert(meta_block->is_free == MMANAGER_TRUE && meta_block->next_block->is_free == MMANAGER_TRUE);
+        }
+
+    }
+
+    printf("Numbers of free      [meta]blocks: [ %ld ]\n", count_free_blocks);
+    printf("Numbers of allocated [meta]blocks: [ %ld ]\n", count_non_free_blocks);
+    printf("Address and Size of Largest free block:      [%p] - [%ld]\n", large_free_block_addr, large_free_block);
+    printf("Address and Size of Largest allocated block: [%p] - [%ld]\n", large_non_free_block_addr, large_non_free_block);
+
+}
+
 void mmanager_print_registered_page_families(){
 
     int count = 0;
@@ -116,7 +158,7 @@ void mmanager_new_page_family(char* struct_name, uint32_t size){
         /* Caso nulo, registra uma nova vm_page_for_families_t (tam: PAGE_SIZE)*/
         first_vm_page_for_families = (vm_page_for_families_t *) mmanager_page_alloc(1);
         first_vm_page_for_families->next = NULL;
-        first_vm_page_for_families->vm_page_quantity++;
+        first_vm_page_for_families->vm_page_for_families_quantity++;
 
         /* Popula a struct */
         strncpy(first_vm_page_for_families->vm_page_family[0].struct_name, struct_name, MAXSIZE_PAGE_FAMILY_NAME);
@@ -143,7 +185,7 @@ void mmanager_new_page_family(char* struct_name, uint32_t size){
 
         new_vm_page_for_families = (vm_page_for_families_t *)mmanager_page_alloc(1);
         new_vm_page_for_families->next = first_vm_page_for_families;
-        new_vm_page_for_families->vm_page_quantity++;
+        new_vm_page_for_families->vm_page_for_families_quantity++;
         first_vm_page_for_families = new_vm_page_for_families;
         vm_page_family_curr = &first_vm_page_for_families->vm_page_family[0];
     }
