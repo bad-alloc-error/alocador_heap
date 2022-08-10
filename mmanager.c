@@ -91,7 +91,6 @@ void mmanager_print_meta_blocks_vm_page(meta_block_data_t* first_meta_block){
                 large_non_free_block_addr = meta_block;
             }
 
-            assert(meta_block->is_free == MMANAGER_TRUE && meta_block->next_block->is_free == MMANAGER_TRUE);
         }
 
     }
