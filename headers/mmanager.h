@@ -76,6 +76,7 @@ void mmanager_new_page_family(char* stuct_name, uint32_t size);
 void mmanager_print_registered_page_families();
 void mmanager_print_meta_blocks_vm_page(meta_block_data_t* meta_block);
 static void* mmanager_page_alloc(int vmp_units);
+static void* mmanager_merge_free_blocks(meta_block_data_t* first_block, meta_block_data_t* second_block);
 static signed int mmanager_page_dealloc(void* memory_page_addr, int units);
 vm_page_family_t* lookup_page_family_by_name(char *struct_name);
 
