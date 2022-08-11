@@ -127,7 +127,6 @@ static void* mmanager_merge_free_blocks(meta_block_data_t* first_block, meta_blo
         first_block->next_block = second_block->next_block;
         /*checa se o bloco anterior não é o último alocado*/
         if(second_block->next_block){ second_block->next_block->prev_block = first_block; }
-        first_block = memset(first_block, 0, first_block->block_size);
         return (void *) first_block;
 
     }else{
