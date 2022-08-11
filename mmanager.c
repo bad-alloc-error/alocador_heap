@@ -119,6 +119,25 @@ void mmanager_print_registered_page_families(){
 
 }   
 
+static void* mmanager_merge_free_blocks(meta_block_data_t* first_block, meta_block_data_t* second_block){
+
+    if(first_block->is_free = MMANAGER_TRUE && second_block->is_free == MMANAGER_TRUE){
+        
+        first_block->block_size += sizeof(meta_block_data_t) + second_block->block_size;
+        first_block->next_block = second_block->next_block;
+        /*checa se o bloco anterior não é o último alocado*/
+        if(second_block->next_block){ second_block->next_block->prev_block = first_block; }
+        first_block = memset(first_block, 0, first_block->block_size);
+        return (void *) first_block;
+
+    }else{
+
+        fprintf(stderr, "%s could not merge data blocks at [%p] and [%p] \n", __FUNCTION__, first_block, second_block);
+        return NULL;
+    }
+}
+
+
 vm_page_family_t* lookup_page_family_by_name(char* struct_name){
 
     vm_page_for_families_t* first_vm_page = first_vm_page_for_families;
