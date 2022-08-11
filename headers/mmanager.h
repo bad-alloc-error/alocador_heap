@@ -41,6 +41,9 @@
     FREE_META_BLOCK->next_block = ALLOCATED_META_BLOCK->next_block \
     ALLOCATED_META_BLOCK->next_block = FREE_META_BLOCK \
     FREE_META_BLOCK->block_size = ((PAGE_SIZE - ALLOCATED_META_BLOCK->block_size) - (sizeof(ALLOCATED_META_BLOCK) - sizeof(FREE_META_BLOCK)))/\
+    ALLOCATED_META_BLOCK->is_free = MMANAGER_FALSE \     
+    if(FREE_META_BLOCK->next_block != NULL) \
+    FREE_META_BLOCK->next_block->prev_block = FREE_META_BLOCK
     
 #define MAXSIZE_PAGE_FAMILY_NAME 32 
 
