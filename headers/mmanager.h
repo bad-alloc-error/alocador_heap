@@ -68,12 +68,12 @@ typedef struct vm_meta_block_data_{
     uint32_t block_size;
     struct vm_meta_block_data_ *prev_block;
     struct vm_meta_block_data_ *next_block;
-    uint64_t offset;
+    uint32_t offset;
 }meta_block_data_t;
 
 void mmanager_init(void);
 void mmanager_new_page_family(char* stuct_name, uint32_t size);
-void mmanager_print_registered_page_families();
+void mmanager_print_registered_page_families(void);
 void mmanager_print_meta_blocks_vm_page(meta_block_data_t* meta_block);
 static void* mmanager_page_alloc(int vmp_units);
 static void* mmanager_merge_free_blocks(meta_block_data_t* first_block, meta_block_data_t* second_block);
