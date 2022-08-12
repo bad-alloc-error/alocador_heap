@@ -45,6 +45,12 @@
     if(FREE_META_BLOCK->next_block != NULL) \
     FREE_META_BLOCK->next_block->prev_block = FREE_META_BLOCK
     
+#define SET_VM_PAGE_EMPTY(VM_PAGE_T_PTR) \
+    VM_PAGE_T_PTR->meta_block_data.is_free == MMANAGER_TRUE \
+    VM_PAGE_T_PTR->prev = NULL \
+    VM_PAGE_T_PTR->next = NULL
+
+
 #define MAXSIZE_PAGE_FAMILY_NAME 32 
 
 typedef enum{
@@ -52,10 +58,25 @@ typedef enum{
     MMANAGER_FALSE
 }vm_bool_t;
 
+
 typedef struct vm_page_family_{
     char struct_name[MAXSIZE_PAGE_FAMILY_NAME];
     uint32_t size;
+    vm_page_ *first_page;
 }vm_page_family_t;
+
+/*Estrutura para navegação entre as vm pages. Ou seja, quando o heapmanager receber uma nova
+  página de memória virtual do kernel, será feito um cast para o tipo dessa struct(vm_page_t).
+ *pg_family aponta para a vm_page_family_t anterior.
+  char page_memory[0] é o primeiro bloco de dados (data block) na vm page.  
+ */
+typedef struct vm_page_{
+    vm_page_* prev;
+    vm_page_* next;
+    vm_page_family_t* pg_family;
+    meta_block_data_t meta_block_data;
+    char page_memory[0];
+}vm_page_t;
 
 typedef struct vm_page_for_families_{
     struct vm_page_for_families_* next;
@@ -76,6 +97,7 @@ void mmanager_new_page_family(char* stuct_name, uint32_t size);
 void mmanager_print_registered_page_families(void);
 void mmanager_print_meta_blocks_vm_page(meta_block_data_t* meta_block);
 static void* mmanager_page_alloc(int vmp_units);
+vm_bool_t mmanager_is_vm_page_empty(vm_page_t* vm_page);
 static void* mmanager_merge_free_blocks(meta_block_data_t* first_block, meta_block_data_t* second_block);
 static signed int mmanager_page_dealloc(void* memory_page_addr, int units);
 vm_page_family_t* lookup_page_family_by_name(char *struct_name);
