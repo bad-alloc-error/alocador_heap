@@ -102,7 +102,7 @@ void mmanager_print_meta_blocks_vm_page(meta_block_data_t* first_meta_block){
 
 }
 
-void mmanager_print_registered_page_families(){
+void mmanager_print_registered_page_families(void){
 
     int count = 0;
     vm_page_for_families_t* first_vm_page = first_vm_page_for_families;
