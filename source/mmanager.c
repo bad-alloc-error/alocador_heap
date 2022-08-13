@@ -64,7 +64,7 @@ static signed int mmanager_page_dealloc(void* memory_page_addr, int units){
 /*retorna o tamanho de data blocks(free) de uma vm page vazia*/
 static inline uint32_t mmanager_max_page_allocatable_mem(int units){
 
-    return (uint32_t) ((PAGE_SIZE * units) - OFFSET_OF(vm_page_t, page_memory));
+    return (uint32_t) ((PAGE_SIZE * units) - offsetof(vm_page_t, page_memory));
 
 }
 
