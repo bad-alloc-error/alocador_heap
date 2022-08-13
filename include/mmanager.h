@@ -24,9 +24,7 @@
 /*VM_PAGE_FAMILY_PTR = vm_page_family_t | CURRENT = vm_page_t*/
 #define ITER_VM_PAGE_BEGIN(VM_PAGE_FAMILY_PTR, CURRENT) \
 { \
-    for(VM_PAGE_FAMILY_PTR; VM_PAGE_FAMILY_PTR->first_page; CURRENT = CURRENT->next){ \
-        printf("Meta Block Size: [%d]\nOffset: [%d]\nNext Page Family Addr: [%p]\n", \
-                CURRENT->meta_block_data.block_size, CURRENT->meta_block_data.offset, CURRENT->pg_family); \
+    for(VM_PAGE_FAMILY_PTR; VM_PAGE_FAMILY_PTR->first_page; CURRENT = CURRENT->pg_family){ \
 
 #define ITER_VM_PAGE_END(VM_PAGE_FAMILY_PTR, CURRENT) }} \
 
@@ -101,8 +99,8 @@ typedef struct vm_meta_block_data_{
   char page_memory[0] é o primeiro bloco de dados (data block) na vm page.  
  */
 typedef struct vm_page_{
-    vm_page_* prev;
-    vm_page_* next;
+    vm_page_ *prev;
+    vm_page_ *next;
     vm_page_family_t* pg_family;
     meta_block_data_t meta_block_data;
     char page_memory[0];
