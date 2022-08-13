@@ -80,6 +80,18 @@ typedef enum vm_bool_{
 
 #define MAXSIZE_PAGE_FAMILY_NAME 32 
 
+/*Estrutura para navegação entre as vm pages. Ou seja, quando o heapmanager receber uma nova
+  página de memória virtual do kernel, será feito um cast para o tipo dessa struct(vm_page_t).
+ *pg_family aponta para a vm_page_family_t anterior.
+  char page_memory[0] é o primeiro bloco de dados (data block) na vm page.  
+ */
+struct vm_page_t{
+    vm_page_t *prev;
+    vm_page_t *next;
+    vm_page_family_t* pg_family;
+    vm_meta_block_data_t meta_block_data;
+    char page_memory[0];
+};
 
 struct vm_page_family_t{
     char struct_name[MAXSIZE_PAGE_FAMILY_NAME];
@@ -101,18 +113,6 @@ struct vm_meta_block_data_t{
     uint32_t offset;
 };
 
-/*Estrutura para navegação entre as vm pages. Ou seja, quando o heapmanager receber uma nova
-  página de memória virtual do kernel, será feito um cast para o tipo dessa struct(vm_page_t).
- *pg_family aponta para a vm_page_family_t anterior.
-  char page_memory[0] é o primeiro bloco de dados (data block) na vm page.  
- */
-struct vm_page_t{
-    vm_page_t *prev;
-    vm_page_t *next;
-    vm_page_family_t* pg_family;
-    vm_meta_block_data_t meta_block_data;
-    char page_memory[0];
-};
 
 void mmanager_init(void);
 void mmanager_new_page_family(char* stuct_name, uint32_t size);
