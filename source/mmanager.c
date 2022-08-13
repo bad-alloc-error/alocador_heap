@@ -19,7 +19,7 @@ static size_t PAGE_SIZE = 0;
 
     3- Verifica se a nova vm_page_family_t pode ser adicionada a first_vm_page_for_families_t.
         3.1- Se caso ela pode ser adicionada, então vm_page_family_t é
-             adicionada no array vm_page_family da estrutura vm_page_for_families_t.
+             adicionada.
                 3.2- No caso de não entrada então o gerenciador requer uma nova
                 página para o kernel, atualiza o ponteiro first_vm_page_for_families
                 para a página alocada mais recentemente.
