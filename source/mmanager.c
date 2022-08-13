@@ -4,7 +4,7 @@
 #include<string.h>
 #include<stdio.h>
 #include<assert.h>
-#include"include/mmanager.h"
+#include"../include/mmanager.h"
 
 static size_t PAGE_SIZE = 0;
 
@@ -38,8 +38,7 @@ static void* mmanager_page_alloc(int vmp_units){
 
     if(mem_page == MAP_FAILED){
 
-        /*TODO LOGGING */
-        fprintf(stderr, "Error %s() to alloc %d virtual page memory\n", __FUNCTION__, vmp_units);
+        LOG_ERROR("Error %s() to alloc %d virtual page memory\n", __FUNCTION__, vmp_units);
         return NULL;
     }
 
@@ -53,8 +52,8 @@ static signed int mmanager_page_dealloc(void* memory_page_addr, int units){
     signed int SUCCESS_RELEASE = munmap(memory_page_addr, units);
 
     if(!SUCCESS_RELEASE){
-        /*TODO LOGGING */
-        fprintf(stderr, "Error %s() to release %d virtual page memory\n", __FUNCTION__, units);
+        
+        LOG_ERROR("Error %s() to release %d virtual page memory\n", __FUNCTION__, units);
         return -1;
     }
 
@@ -65,7 +64,7 @@ static signed int mmanager_page_dealloc(void* memory_page_addr, int units){
 /*retorna o tamanho de data blocks(free) de uma vm page vazia*/
 static inline uint32_t mmanager_max_page_allocatable_mem(int units){
 
-    return (uint32_t) ((PAGE_SIZE * units) - OFFSET_OF(vm_page_t, "page_memory"));
+    return (uint32_t) ((PAGE_SIZE * units) - OFFSET_OF(vm_page_t, page_memory));
 
 }
 
@@ -76,11 +75,11 @@ vm_bool_t mmanager_is_vm_page_empty(vm_page_t* vm_page){
     return MMANAGER_FALSE;
 }
 
-void mmanager_print_meta_blocks_vm_page(meta_block_data_t* first_meta_block){
+void mmanager_print_meta_blocks_vm_page(vm_meta_block_data_t* first_meta_block){
 
-    meta_block_data_t* meta_block = first_meta_block;
-    meta_block_data_t* large_free_block_addr = NULL;
-    meta_block_data_t* large_non_free_block_addr = NULL;
+    vm_meta_block_data_t* meta_block = first_meta_block;
+    vm_meta_block_data_t* large_free_block_addr = NULL;
+    vm_meta_block_data_t* large_non_free_block_addr = NULL;
     vm_page_for_families_t* first_page_families = first_vm_page_for_families;
     int64_t count_free_blocks, count_non_free_blocks, large_free_block, large_non_free_block = 0;
     
@@ -133,11 +132,11 @@ void mmanager_print_registered_page_families(void){
 
 }   
 
-static void* mmanager_merge_free_blocks(meta_block_data_t* first_block, meta_block_data_t* second_block){
+static void* mmanager_merge_free_blocks(vm_meta_block_data_t* first_block, vm_meta_block_data_t* second_block){
 
     if(first_block->is_free = MMANAGER_TRUE && second_block->is_free == MMANAGER_TRUE){
         
-        first_block->block_size += sizeof(meta_block_data_t) + second_block->block_size;
+        first_block->block_size += sizeof(vm_meta_block_data_t) + second_block->block_size;
         first_block->next_block = second_block->next_block;
         /*checa se o bloco anterior não é o último alocado*/
         if(second_block->next_block){ second_block->next_block->prev_block = first_block; }
@@ -145,7 +144,7 @@ static void* mmanager_merge_free_blocks(meta_block_data_t* first_block, meta_blo
 
     }else{
 
-        fprintf(stderr, "%s could not merge data blocks at [%p] and [%p] \n", __FUNCTION__, first_block, second_block);
+        LOG_ERROR("%s could not merge data blocks at [%p] and [%p] \n", __FUNCTION__, first_block, second_block);
         return NULL;
     }
 }
@@ -180,7 +179,7 @@ void mmanager_new_page_family(char* struct_name, uint32_t size){
 
     if(size > PAGE_SIZE){
 
-        fprintf(stderr, "Error: %s() structure %s size exceeds system page size\n", __FUNCTION__, struct_name);
+        LOG_ERROR("Error: %s() structure %s size exceeds system page size\n", __FUNCTION__, struct_name);
         return;
     }
 
