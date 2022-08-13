@@ -1,6 +1,7 @@
 #ifndef _MMANAGER_H_
 #define _MMANAGER_H_
 #include<stdint.h>
+#include<stddef.h>
 #include"struct_declare.h"
 
 
