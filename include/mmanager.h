@@ -31,14 +31,17 @@
 /*CURRENT é um ponteiro para um meta block*/
 #define ITER_VM_PAGE_ALL_BLOCKS_BEGIN(VM_PAGE_PTR, CURRENT) \
 {   \
-    for(VM_PAGE_PTR; VM_PAGE_PTR != NULL; CURRENT = CURRENT->next_block){\
+    meta_block_data_t* next = NULL;\
+    CURRENT = &VM_PAGE_PTR->meta_block_data; \
+    for(CURRENT; CURRENT; CURRENT = CURRENT->next{\
+        next = NEXT_META_BLOCK(CURRENT); \
         printf("Meta Block Size: [%d]\nOffset: [%d]\nPrev Block Addr: [%p]\nNext Block Addr: [%p]\n", \
                 CURRENT->block_size, CURRENT->offset, CURRENT->prev_block, CURRENT->next_block); \
     
 #define ITER_VM_PAGE_ALL_BLOCKS_BEGIN(VM_PAGE_PTR, CURRENT) }} \
 
 #define OFFSET_OF(CONTAINER_STRUCT, FIELD_NAME) \
-    (CONTAINER_STRUCT, FIELD_NAME)(size_t)(&((CONTAINER_STRUCT *)0)->FIELD_NAME)
+    (CONTAINER_STRUCT, #FIELD_NAME)(size_t)(&((CONTAINER_STRUCT *)0)->FIELD_NAME)
 
 #define MMANAGER_GET_PAGE_FROM_META_BLOCK(META_DATA_BLOCK_PTR) \
     ((void *)((char *)META_DATA_BLOCK_PTR - META_DATA_BLOCK_PTR->offset))
