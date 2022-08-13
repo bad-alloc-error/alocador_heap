@@ -1,6 +1,11 @@
 #ifndef _MMANAGER_H_
 #define _MMANAGER_H_
 #include<stdint.h>
+#include"struct_declare.h"
+
+
+#define LOG_ERROR(msg, ...) \
+    fprintf(stderr, msg, __VA_ARGS__)
 
 /*Para obter o número máximo de page_family_t que podemos armazenar dentro de uma page
     do tipo vm_page_for_families_t é pegar o tamanho da pagina alocada, subtrair pelo tamanho
@@ -12,6 +17,11 @@
 #define MAX_FAMILIES_PER_VM_PAGE \
     (PAGE_SIZE - sizeof(vm_page_for_families_t *)/\
         sizeof(vm_page_family_t))
+
+typedef enum vm_bool_{
+    MMANAGER_TRUE,
+    MMANAGER_FALSE
+}vm_bool_t;
 
 #define ITER_PAGE_FAMILY_BEGIN(FIRST_PAGE_FOR_FAMILIES_PTR, CURRENT) \
 {                                                          \
@@ -33,8 +43,7 @@
 {   \
     meta_block_data_t* next = NULL;\
     CURRENT = &VM_PAGE_PTR->meta_block_data; \
-    for(CURRENT; CURRENT; CURRENT = CURRENT->next{\
-        next = NEXT_META_BLOCK(CURRENT); \
+    for(CURRENT; CURRENT; CURRENT = NEXT_META_BLOCK(CURRENT)){\
         printf("Meta Block Size: [%d]\nOffset: [%d]\nPrev Block Addr: [%p]\nNext Block Addr: [%p]\n", \
                 CURRENT->block_size, CURRENT->offset, CURRENT->prev_block, CURRENT->next_block); \
     
@@ -71,51 +80,47 @@
 
 #define MAXSIZE_PAGE_FAMILY_NAME 32 
 
-typedef enum{
-    MMANAGER_TRUE,
-    MMANAGER_FALSE
-}vm_bool_t;
 
-typedef struct vm_page_family_{
+struct vm_page_family_t{
     char struct_name[MAXSIZE_PAGE_FAMILY_NAME];
     uint32_t size;
-    vm_page_ *first_page;
-}vm_page_family_t;
+    vm_page_t *first_page;
+};
 
-typedef struct vm_page_for_families_{
+struct vm_page_for_families_t{
     struct vm_page_for_families_* next;
     vm_page_family_t vm_page_family[0];
     uint32_t vm_page_for_families_quantity;
-}vm_page_for_families_t;
+};
 
-typedef struct vm_meta_block_data_{
+struct vm_meta_block_data_t{
     vm_bool_t is_free;
     uint32_t block_size;
-    struct vm_meta_block_data_ *prev_block;
-    struct vm_meta_block_data_ *next_block;
+    struct vm_meta_block_data_t *prev_block;
+    struct vm_meta_block_data_t *next_block;
     uint32_t offset;
-}meta_block_data_t;
+};
 
 /*Estrutura para navegação entre as vm pages. Ou seja, quando o heapmanager receber uma nova
   página de memória virtual do kernel, será feito um cast para o tipo dessa struct(vm_page_t).
  *pg_family aponta para a vm_page_family_t anterior.
   char page_memory[0] é o primeiro bloco de dados (data block) na vm page.  
  */
-typedef struct vm_page_{
-    vm_page_ *prev;
-    vm_page_ *next;
+struct vm_page_t{
+    vm_page_t *prev;
+    vm_page_t *next;
     vm_page_family_t* pg_family;
-    meta_block_data_t meta_block_data;
+    vm_meta_block_data_t meta_block_data;
     char page_memory[0];
-}vm_page_t;
+};
 
 void mmanager_init(void);
 void mmanager_new_page_family(char* stuct_name, uint32_t size);
 void mmanager_print_registered_page_families(void);
-void mmanager_print_meta_blocks_vm_page(meta_block_data_t* meta_block);
+void mmanager_print_meta_blocks_vm_page(vm_meta_block_data_t* meta_block);
 static void* mmanager_page_alloc(int vmp_units);
 vm_bool_t mmanager_is_vm_page_empty(vm_page_t* vm_page);
-static void* mmanager_merge_free_blocks(meta_block_data_t* first_block, meta_block_data_t* second_block);
+static void* mmanager_merge_free_blocks(vm_meta_block_data_t* first_block, vm_meta_block_data_t* second_block);
 static signed int mmanager_page_dealloc(void* memory_page_addr, int units);
 vm_page_family_t* lookup_page_family_by_name(char *struct_name);
 
