@@ -62,6 +62,20 @@ static signed int mmanager_page_dealloc(void* memory_page_addr, int units){
 
 }
 
+/*retorna o tamanho de data blocks(free) de uma vm page vazia*/
+static inline uint32_t mmanager_max_page_allocatable_mem(int units){
+
+    return (uint32_t) ((PAGE_SIZE * units) - OFFSET_OF(vm_page_t, "page_memory"));
+
+}
+
+vm_bool_t mmanager_is_vm_page_empty(vm_page_t* vm_page){
+
+    if(vm_page->meta_block_data.is_free == MMANAGER_TRUE && vm_page->meta_block_data.prev_block == NULL && vm_page->meta_block_data.next_block == NULL) { return MMANAGER_TRUE; } 
+    
+    return MMANAGER_FALSE;
+}
+
 void mmanager_print_meta_blocks_vm_page(meta_block_data_t* first_meta_block){
 
     meta_block_data_t* meta_block = first_meta_block;
