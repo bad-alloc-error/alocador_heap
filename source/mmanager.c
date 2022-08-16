@@ -8,6 +8,9 @@
 
 static size_t PAGE_SIZE = 0;
 
+/*Para entender melhor as funções mmanager_dealloc_and_free() e mmanager_alloc_vm_page() pegue uma folha
+    e desenhe. Sempre funciona!*/
+
 /* Aponta para o objeto instanciado mais recentemente.
     
     1- Instancia uma nova vm_page_family_t.
@@ -77,21 +80,50 @@ vm_page_t* mmanager_alloc_vm_page(vm_page_family_t* vm_page_family){
 
     vm_page->pg_family = vm_page_family;
 
-    /*se for a primeira page de uma familia de pages*/
+    /*se for o primeiro nó(page) de uma familia de pages*/
     if(vm_page_family->first_page == NULL){
         vm_page_family->first_page = vm_page;
         return vm_page;
     }
 
-    /*insere na cabeça da lista*/
+    /*insere o nó na cabeça da lista*/
     vm_page->next = vm_page_family->first_page;
     vm_page_family->first_page->prev = vm_page;
     return vm_page;
 
 }
 
+/*desaloca e deleta da lista o nó criado pela função mmanager_alloc_vm_page()*/
+void mmanager_delete_and_free(vm_page_t* vm_page){
 
-/*retorna o tamanho de data blocks(free) de uma vm page vazia*/
+    vm_page_family_t* vm_page_family = vm_page->pg_family;
+
+    /*se o nó deletado for o nó cabeça*/
+    if(vm_page_family->first_page == vm_page){
+
+        vm_page_family->first_page->next = vm_page->next;
+        
+        if(vm_page->next){
+            /*aponta null porque sera o nó cabeça*/
+            vm_page->next->prev = NULL;
+        }
+
+        vm_page->next = NULL;
+        vm_page->prev = NULL;
+        mmanager_page_dealloc((void *)vm_page, 1);
+        return;
+    }
+
+    if(vm_page->next){
+        vm_page->next->prev = vm_page->prev;
+    }
+
+    vm_page->prev->next = vm_page->next;
+    mmanager_page_dealloc((void *)vm_page, 1);
+}
+
+
+/*retorna o tamanho de data blocks(free) de um nó(vm page) vazio*/
 static inline uint32_t mmanager_max_page_allocatable_mem(int units){
 
     return (uint32_t) ((PAGE_SIZE * units) - offsetof(vm_page_t, page_memory));
