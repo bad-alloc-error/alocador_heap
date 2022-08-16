@@ -8,7 +8,7 @@
 
 static size_t PAGE_SIZE = 0;
 
-/*Para entender melhor as funções mmanager_dealloc_and_free() e mmanager_alloc_vm_page() pegue uma folha
+/*Para entender melhor as funções mmanager_dealloc_vm_page() e mmanager_alloc_vm_page() pegue uma folha
     e desenhe. Sempre funciona!*/
 
 /* Aponta para o objeto instanciado mais recentemente.
@@ -94,7 +94,7 @@ vm_page_t* mmanager_alloc_vm_page(vm_page_family_t* vm_page_family){
 }
 
 /*desaloca e deleta da lista o nó criado pela função mmanager_alloc_vm_page()*/
-void mmanager_delete_and_free(vm_page_t* vm_page){
+void mmanager_dealloc_mv_page(vm_page_t* vm_page){
 
     vm_page_family_t* vm_page_family = vm_page->pg_family;
 
