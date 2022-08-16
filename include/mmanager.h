@@ -75,9 +75,9 @@ typedef enum vm_bool_{
     FREE_META_BLOCK->next_block->prev_block = FREE_META_BLOCK
     
 #define SET_VM_PAGE_EMPTY(VM_PAGE_T_PTR) \
-    VM_PAGE_T_PTR->meta_block_data.is_free == MMANAGER_TRUE \
-    VM_PAGE_T_PTR->meta_block_data.prev_block = NULL \
-    VM_PAGE_T_PTR->meta_block_data.next_block = NULL
+    VM_PAGE_T_PTR->meta_block_data.is_free == MMANAGER_TRUE; \
+    VM_PAGE_T_PTR->meta_block_data.prev_block = NULL; \
+    VM_PAGE_T_PTR->meta_block_data.next_block = NULL;
 
 #define MAXSIZE_PAGE_FAMILY_NAME 32 
 
@@ -121,7 +121,7 @@ void mmanager_init(void);
 void mmanager_new_page_family(char* stuct_name, uint32_t size);
 void mmanager_print_registered_page_families(void);
 void mmanager_print_meta_blocks_vm_page(vm_meta_block_data_t* meta_block);
-void mmanager_delete_and_free(vm_page_t* vm_page);
+void mmanager_dealloc_mv_page(vm_page_t* vm_page);
 vm_page_t* mmanager_alloc_vm_page(vm_page_family_t* vm_page_family);
 static void* mmanager_page_alloc(int vmp_units);
 static void* mmanager_merge_free_blocks(vm_meta_block_data_t* first_block, vm_meta_block_data_t* second_block);
