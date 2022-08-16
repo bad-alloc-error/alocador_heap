@@ -122,11 +122,11 @@ void mmanager_new_page_family(char* stuct_name, uint32_t size);
 void mmanager_print_registered_page_families(void);
 void mmanager_print_meta_blocks_vm_page(vm_meta_block_data_t* meta_block);
 void mmanager_delete_and_free(vm_page_t* vm_page);
-vm_page_t* alloc_vm_page(vm_page_family_t* vm_page_family);
+vm_page_t* mmanager_alloc_vm_page(vm_page_family_t* vm_page_family);
 static void* mmanager_page_alloc(int vmp_units);
-vm_bool_t mmanager_is_vm_page_empty(vm_page_t* vm_page);
 static void* mmanager_merge_free_blocks(vm_meta_block_data_t* first_block, vm_meta_block_data_t* second_block);
 static signed int mmanager_page_dealloc(void* memory_page_addr, int units);
+vm_bool_t mmanager_is_vm_page_empty(vm_page_t* vm_page);
 vm_page_family_t* lookup_page_family_by_name(char *struct_name);
 
 #endif
