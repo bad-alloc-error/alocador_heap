@@ -61,6 +61,36 @@ static signed int mmanager_page_dealloc(void* memory_page_addr, int units){
 
 }
 
+vm_page_t* mmanager_alloc_vm_page(vm_page_family_t* vm_page_family){
+
+    vm_page_t* vm_page = mmanager_page_alloc(1);
+    SET_VM_PAGE_EMPTY(vm_page);
+
+    /*o tamanho do meu data block*/
+    vm_page->meta_block_data.block_size = mmanager_max_page_allocatable_mem(1);
+
+    /*distancia entre o meta block e o primeiro endereço da página*/
+    vm_page->meta_block_data.offset = offsetof(vm_page_t, meta_block_data);
+
+    vm_page->prev = NULL;
+    vm_page->next = NULL;
+
+    vm_page->pg_family = vm_page_family;
+
+    /*se for a primeira page de uma familia de pages*/
+    if(vm_page_family->first_page == NULL){
+        vm_page_family->first_page = vm_page;
+        return vm_page;
+    }
+
+    /*insere na cabeça da lista*/
+    vm_page->next = vm_page_family->first_page;
+    vm_page_family->first_page->prev = vm_page;
+    return vm_page;
+
+}
+
+
 /*retorna o tamanho de data blocks(free) de uma vm page vazia*/
 static inline uint32_t mmanager_max_page_allocatable_mem(int units){
 
@@ -70,7 +100,10 @@ static inline uint32_t mmanager_max_page_allocatable_mem(int units){
 
 vm_bool_t mmanager_is_vm_page_empty(vm_page_t* vm_page){
 
-    if(vm_page->meta_block_data.is_free == MMANAGER_TRUE && vm_page->meta_block_data.prev_block == NULL && vm_page->meta_block_data.next_block == NULL) { return MMANAGER_TRUE; } 
+    if(vm_page->meta_block_data.is_free == MMANAGER_TRUE &&
+        vm_page->meta_block_data.prev_block == NULL &&
+        vm_page->meta_block_data.next_block == NULL)
+        { return MMANAGER_TRUE; } 
     
     return MMANAGER_FALSE;
 }
