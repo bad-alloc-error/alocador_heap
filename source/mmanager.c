@@ -34,6 +34,13 @@ void mmanager_init(){
     PAGE_SIZE = getpagesize();
 }
 
+/*retorna o tamanho de data blocks(free) de um nó(vm page) vazio*/
+static inline uint32_t mmanager_max_page_allocatable_mem(int units){
+
+    return (uint32_t) ((PAGE_SIZE * units) - offsetof(vm_page_t, page_memory));
+
+}
+
 static void* mmanager_page_alloc(int vmp_units){
 
     char *mem_page = mmap(NULL, vmp_units * PAGE_SIZE, PROT_EXEC | PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, NULL, NULL);
@@ -122,14 +129,6 @@ void mmanager_dealloc_mv_page(vm_page_t* vm_page){
     mmanager_page_dealloc((void *)vm_page, 1);
 }
 
-
-/*retorna o tamanho de data blocks(free) de um nó(vm page) vazio*/
-static inline uint32_t mmanager_max_page_allocatable_mem(int units){
-
-    return (uint32_t) ((PAGE_SIZE * units) - offsetof(vm_page_t, page_memory));
-
-}
-
 vm_bool_t mmanager_is_vm_page_empty(vm_page_t* vm_page){
 
     if(vm_page->meta_block_data.is_free == MMANAGER_TRUE &&
@@ -187,11 +186,12 @@ void mmanager_print_registered_page_families(void){
     vm_page_family_t* page_family_current = NULL;
 
     for(first_vm_page; first_vm_page != NULL; first_vm_page = first_vm_page->next){
-        
-        ITER_PAGE_FAMILY_BEGIN(first_vm_page, page_family_current){
+       
+        uint32_t count_macro = 0;
+        for(page_family_current = (vm_page_family_t *)&first_vm_page->vm_page_family[0]; page_family_current->size && count_macro < MAX_FAMILIES_PER_VM_PAGE; page_family_current++, count_macro++){
             printf("Page Family Name: %s - Size: %d\n", first_vm_page->vm_page_family[count].struct_name, first_vm_page->vm_page_family[count].size);
             count++;
-        }ITER_PAGE_FAMILY_END(first_vm_page, page_family_current);
+        }
 
     }
 
@@ -222,14 +222,15 @@ vm_page_family_t* lookup_page_family_by_name(char* struct_name){
 
     for(first_vm_page; first_vm_page != NULL; first_vm_page = first_vm_page->next){
 
-        ITER_PAGE_FAMILY_BEGIN(first_vm_page, page_family_current){
-
-            if(strncmp(page_family_current->struct_name, struct_name, MAXSIZE_PAGE_FAMILY_NAME) == 0){
+        uint32_t count_macro = 0;                                  
+        for(page_family_current = (vm_page_family_t *)&first_vm_page->vm_page_family[0]; page_family_current->size && count_macro < MAX_FAMILIES_PER_VM_PAGE; page_family_current++, count_macro++){
+        
+           if(strncmp(page_family_current->struct_name, struct_name, MAXSIZE_PAGE_FAMILY_NAME) == 0){
                 
                 return page_family_current;
             }
             
-        }ITER_PAGE_FAMILY_END(first_vm_page, page_family_current);
+        }
 
     }
 
@@ -262,19 +263,18 @@ void mmanager_new_page_family(char* struct_name, uint32_t size){
         return;
     }
 
-    uint32_t count = 0;
-
     /*Itera sobre a Page Family e checa se o número é maior que o permitido de page family na 
         pagina virtual, se for, requer ao kernel uma nova página virtual e armazena a fage family lá.*/
-
-    ITER_PAGE_FAMILY_BEGIN(first_vm_page_for_families, vm_page_family_curr){
+    uint32_t count = 0;
+    uint32_t count_macro = 0; 
+    for(vm_page_family_curr = (vm_page_family_t *)&first_vm_page_for_families->vm_page_family[0]; vm_page_family_curr->size && count_macro < MAX_FAMILIES_PER_VM_PAGE; vm_page_family_curr++, count_macro++){
 
         if(strncmp(vm_page_family_curr->struct_name, struct_name, MAXSIZE_PAGE_FAMILY_NAME) != 0){
             count++;
             continue;
         }
 
-    }ITER_PAGE_FAMILY_END(first_vm_page_for_families, vm_page_family_curr);
+    }
 
     if(count == MAX_FAMILIES_PER_VM_PAGE){
 
