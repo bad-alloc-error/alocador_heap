@@ -24,14 +24,6 @@ typedef enum vm_bool_{
     MMANAGER_FALSE
 }vm_bool_t;
 
-#define ITER_PAGE_FAMILY_BEGIN(FIRST_PAGE_FOR_FAMILIES_PTR, CURRENT) \
-{                                                          \
-    uint32_t count_macro = 0;                                  \
-    for(CURRENT = (vm_page_family_t *)&FIRST_PAGE_FOR_FAMILIES_PTR->vm_page_family[0]; \
-                    CURRENT->size && count_macro < MAX_FAMILIES_PER_VM_PAGE; CURRENT++, count_macro++){ \
-
-#define ITER_PAGE_FAMILY_END(FIRST_PAGE_FOR_FAMILIES_PTR, CURRENT) }}
-
 /*VM_PAGE_FAMILY_PTR = vm_page_family_t | CURRENT = vm_page_t*/
 #define ITER_VM_PAGE_BEGIN(VM_PAGE_FAMILY_PTR, CURRENT) \
 { \
@@ -88,7 +80,7 @@ struct vm_page_family_t{
 };
 
 struct vm_page_for_families_t{
-    struct vm_page_for_families_* next;
+    struct vm_page_for_families_t* next;
     vm_page_family_t vm_page_family[0];
     uint32_t vm_page_for_families_quantity;
 };
